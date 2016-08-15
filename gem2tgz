@@ -58,9 +58,9 @@ EOF
 
     chown -R root:root .
 
-    makepkg --linkadd y --chown n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+    /sbin/makepkg --linkadd y --chown n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
 
-    [ "x$INSTALL" == "x--install" ] && installpkg $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+    [ "x$INSTALL" == "x--install" ] && /sbin/installpkg $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
     [ "x$CLEAN_AFTER" == "xYES" ] && rm -fr $package_this_PKG
 }
 
@@ -91,7 +91,7 @@ function package_all_under() {
 
 function cleanup() {
     for i in $(gem cleanup --dryrun | grep "^Dry" | cut -d\  -f6); do
-        removepkg /var/log/packages/rubygem-$i-*
+        /sbin/removepkg /var/log/packages/rubygem-$i-*
     done
 }
 
