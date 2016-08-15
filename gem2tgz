@@ -18,7 +18,7 @@ TMP=${TMP:-/tmp/${TAG#_}}
 GEMSROOT=${GEMSROOT:-$(gem environment gemdir)}
 
 function list_duplicates() {
-    (cd /var/adm/packages/
+    (cd /var/log/packages/
         ls rubygem-* | sed 's|\(.*\)-.*-.*-.*|\1|g' | uniq -d
     )
 }
@@ -91,7 +91,7 @@ function package_all_under() {
 
 function cleanup() {
     for i in $(gem cleanup --dryrun | grep "^Dry" | cut -d\  -f6); do
-        removepkg /var/adm/packages/rubygem-$i-*
+        removepkg /var/log/packages/rubygem-$i-*
     done
 }
 
