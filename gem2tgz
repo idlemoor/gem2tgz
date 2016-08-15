@@ -58,7 +58,7 @@ EOF
 
     chown -R root:root .
 
-    /sbin/makepkg --linkadd y --chown n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
+    /sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.${PKGTYPE:-tgz}
 
     [ "x$INSTALL" == "x--install" ] && /sbin/installpkg $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
     [ "x$CLEAN_AFTER" == "xYES" ] && rm -fr $package_this_PKG
