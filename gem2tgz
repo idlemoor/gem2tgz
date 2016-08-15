@@ -11,9 +11,9 @@ VERSION=${VERSION:-}
 
 ARCH=noarch
 BUILD=${BUILD:-1}
-TAG=${TAG:-$(basename $0)}
+TAG=${TAG:-_$(basename $0)}
 OUTPUT=${OUTPUT:-/tmp}
-TMP=${TMP:-/tmp/$TAG}
+TMP=${TMP:-/tmp/${TAG#_}}
 
 GEMSROOT=${GEMSROOT:-$(gem environment gemdir)}
 
