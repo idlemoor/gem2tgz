@@ -36,10 +36,10 @@ function package_this() {
 
     cd $package_this_PKG
 
-    PRGNAM=rubygem-$(grep "s\.name = " $package_this_PKG$GEMSROOT/specifications/*.gemspec | grep -o "%q{.*}" | sed 's|%q{||' | tr -d '}')
+    PRGNAM=rubygem-$(grep -a "s\.name = " $package_this_PKG$GEMSROOT/specifications/*.gemspec | grep -a -o "%q{.*}" | sed 's|%q{||' | tr -d '}')
 	# HACK: fallback name pulling for gems not using "%q{.*}"
-	[ "x$PRGNAM" == "xrubygem-" ] && PRGNAM=rubygem-$(grep "s\.name = " $package_this_PKG$GEMSROOT/specifications/*.gemspec | grep -o "\".*\"" | tr -d \")
-    VERSION=$(grep "s\.version = " $package_this_PKG$GEMSROOT/specifications/*.gemspec | grep -o "\".*\"" | tr -d '"')
+	[ "x$PRGNAM" == "xrubygem-" ] && PRGNAM=rubygem-$(grep -a "s\.name = " $package_this_PKG$GEMSROOT/specifications/*.gemspec | grep -a -o "\".*\"" | tr -d \")
+    VERSION=$(grep -a "s\.version = " $package_this_PKG$GEMSROOT/specifications/*.gemspec | grep -a -o "\".*\"" | tr -d '"')
 
 	if [ -d $package_this_PKG$GEMSROOT/bin/ ]; then
 		mkdir -p $package_this_PKG/usr/bin
@@ -50,16 +50,16 @@ function package_this() {
 
     mkdir -p $package_this_PKG/install
     cat <<EOF > $package_this_PKG/install/slack-desc
-$PRGNAM: $PRGNAM ($(grep "s\.summary = " $package_this_PKG$GEMSROOT/specifications/*.gemspec | grep -o "%q{.*}" | sed 's|%q{||' | tr -d '}'))
+$PRGNAM: $PRGNAM ($(grep -a "s\.summary = " $package_this_PKG$GEMSROOT/specifications/*.gemspec | grep -a -o "%q{.*}" | sed 's|%q{||' | tr -d '}'))
 $PRGNAM:
-$PRGNAM: $(grep "s\.description = " $package_this_PKG$GEMSROOT/specifications/*.gemspec | grep -o "%q{.*}" | sed 's|%q{||' | tr -d '}')
-$PRGNAM:
-$PRGNAM:
+$PRGNAM: $(grep -a "s\.description = " $package_this_PKG$GEMSROOT/specifications/*.gemspec | grep -a -o "%q{.*}" | sed 's|%q{||' | tr -d '}')
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: $(grep "s\.homepage = " $package_this_PKG$GEMSROOT/specifications/*.gemspec | grep -o "%q{.*}" | sed 's|%q{||' | tr -d '}')
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: $(grep -a "s\.homepage = " $package_this_PKG$GEMSROOT/specifications/*.gemspec | grep -a -o "%q{.*}" | sed 's|%q{||' | tr -d '}')
 $PRGNAM:
 EOF
 
