@@ -9,9 +9,17 @@ CLEAN_AFTER=${CLEAN_AFTER:-}
 INSTALL=${INSTALL:-}
 VERSION=${VERSION:-}
 
-ARCH=noarch
 BUILD=${BUILD:-1}
 TAG=${TAG:-_$(basename $0)}
+
+if [ -z "$ARCH" ]; then
+  case "$( uname -m )" in
+    i?86) ARCH=i586 ;;
+    arm*) ARCH=arm ;;
+       *) ARCH=$( uname -m ) ;;
+  esac
+fi
+
 OUTPUT=${OUTPUT:-/tmp}
 TMP=${TMP:-/tmp/${TAG#_}}
 
@@ -32,7 +40,6 @@ function package_this() {
 	# HACK: fallback name pulling for gems not using "%q{.*}"
 	[ "x$PRGNAM" == "xrubygem-" ] && PRGNAM=rubygem-$(grep "s\.name = " $package_this_PKG$GEMSROOT/specifications/*.gemspec | grep -o "\".*\"" | tr -d \")
     VERSION=$(grep "s\.version = " $package_this_PKG$GEMSROOT/specifications/*.gemspec | grep -o "\".*\"" | tr -d '"')
-    ARCH=$([[ $(find $package_this_PKG$GEMSROOT -name \*.o -o -name \*.so | wc -l) > 0 ]] && echo $(uname -m) || echo noarch)
 
 	if [ -d $package_this_PKG$GEMSROOT/bin/ ]; then
 		mkdir -p $package_this_PKG/usr/bin
