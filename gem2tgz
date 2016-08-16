@@ -44,7 +44,7 @@ function package_this() {
 	if [ -d $package_this_PKG$GEMSROOT/bin/ ]; then
 		mkdir -p $package_this_PKG/usr/bin
 		for b in $package_this_PKG$GEMSROOT/bin/*; do
-		    cp $b $package_this_PKG/usr/bin
+		    [ -f $b ] && cp $b $package_this_PKG/usr/bin
 		done
 	fi
 
@@ -88,7 +88,7 @@ function package_all_under() {
         if [ -e $TMP/pkg-rubygem-$this_GEM-$this_GEM_VERSION$GEMSROOT/gems/$i/bin/ ]; then
             mkdir -p $TMP/pkg-rubygem-$this_GEM-$this_GEM_VERSION$GEMSROOT/bin/
             for b in $TMP/pkg-rubygem-$this_GEM-$this_GEM_VERSION$GEMSROOT/gems/$i/bin/* ; do
-                cp -a $this_GEMSROOT/bin/$(basename $b) $TMP/pkg-rubygem-$this_GEM-$this_GEM_VERSION$GEMSROOT/bin/
+                [ -f $b ] && cp -a $this_GEMSROOT/bin/$(basename $b) $TMP/pkg-rubygem-$this_GEM-$this_GEM_VERSION$GEMSROOT/bin/
             done
         fi
 
