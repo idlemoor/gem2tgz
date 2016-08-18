@@ -71,7 +71,16 @@ EOF
     mkdir -p $package_this_PKG/usr/doc/$PRGNAM-$VERSION
     sed -e "s/^${PRGNAM}: *//" \
       < $package_this_PKG/install/slack-desc \
-      > $package_this_PKG/usr/doc/$PRGNAM-$VERSION/README
+      > $package_this_PKG/usr/doc/$PRGNAM-$VERSION/README-$(basename $0)
+    for doc in \
+      $package_this_PKG$GEMSROOT/gems/$GEMNAM-$VERSION/README* \
+      $package_this_PKG$GEMSROOT/gems/$GEMNAM-$VERSION/*LICENSE* \
+      $package_this_PKG$GEMSROOT/gems/$GEMNAM-$VERSION/*.md \
+      $package_this_PKG$GEMSROOT/gems/$GEMNAM-$VERSION/*.txt \
+      $package_this_PKG$GEMSROOT/gems/$GEMNAM-$VERSION/*.markdown \
+    ; do
+      [ -f $doc ] && cp -a $doc $package_this_PKG/usr/doc/$PRGNAM-$VERSION/
+    done
 
     if [ -d $package_this_PKG$GEMSROOT/bin/ ]; then
         mkdir -p $package_this_PKG/usr/bin
