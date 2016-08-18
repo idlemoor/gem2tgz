@@ -36,32 +36,49 @@ function package_this() {
 
     cd $package_this_PKG
 
-    PRGNAM=rubygem-$(grep -a "s\.name = " $package_this_PKG$GEMSROOT/specifications/*.gemspec | grep -a -o "%q{.*}" | sed 's|%q{||' | tr -d '}')
-	# HACK: fallback name pulling for gems not using "%q{.*}"
-	[ "x$PRGNAM" == "xrubygem-" ] && PRGNAM=rubygem-$(grep -a "s\.name = " $package_this_PKG$GEMSROOT/specifications/*.gemspec | grep -a -o "\".*\"" | tr -d \")
-    VERSION=$(grep -a "s\.version = " $package_this_PKG$GEMSROOT/specifications/*.gemspec | grep -a -o "\".*\"" | tr -d '"')
+    GEMSPEC=$(ls $package_this_PKG$GEMSROOT/specifications/*.gemspec)
 
-	if [ -d $package_this_PKG$GEMSROOT/bin/ ]; then
-		mkdir -p $package_this_PKG/usr/bin
-		for b in $package_this_PKG$GEMSROOT/bin/*; do
-		    [ -f $b ] && cp $b $package_this_PKG/usr/bin
-		done
-	fi
+    GEMNAM="$(ruby -e "require 'rubygems/specification'; puts Gem::Specification.load(\"$GEMSPEC\").name")"
+    VERSION="$(ruby -e "require 'rubygems/specification'; puts Gem::Specification.load(\"$GEMSPEC\").version" | tr - _)"
+    SUMMARY="$(ruby -e "require 'rubygems/specification'; puts Gem::Specification.load(\"$GEMSPEC\").summary" | sed 's/\.$//')"
+    DESCRIPTION="$(ruby -e "require 'rubygems/specification'; puts Gem::Specification.load(\"$GEMSPEC\").description" | sed -e 's/^ *//')"
+    HOMEPAGE="$(ruby -e "require 'rubygems/specification'; puts Gem::Specification.load(\"$GEMSPEC\").homepage")"
+
+    [ -z "$GEMNAM" ] && GEMNAM="$(echo "$1" | sed 's:.*/pkg-rubygem-::' | rev | cut -f2- -d- | rev)"
+    PRGNAM=rubygem-$GEMNAM
+    [ -z "$VERSION" ] && VERSION="Unknown"
+    [ -z "$SUMMARY" ] && SUMMARY="$GEMNAM ruby gem"
+    [ -z "$DESCRIPTION" ] && DESCRIPTION="$SUMMARY"
+    [ ${#SUMMARY} -gt $(( 67 - ${#PRGNAM} )) ] && SUMMARY="$GEMNAM ruby gem"
+    FMTDESCRIPTION="$(echo "$DESCRIPTION" | fmt -70 - | sed "s/^/$PRGNAM: /" | head -6)"
+    [ -z "$HOMEPAGE" ] && FMTHOMEPAGE="$PRGNAM:" || FMTHOMEPAGE="$PRGNAM: $HOMEPAGE"
 
     mkdir -p $package_this_PKG/install
-    cat <<EOF > $package_this_PKG/install/slack-desc
-$PRGNAM: $PRGNAM ($(grep -a "s\.summary = " $package_this_PKG$GEMSROOT/specifications/*.gemspec | grep -a -o "%q{.*}" | sed 's|%q{||' | tr -d '}'))
+    cat <<EOF | head -11 > $package_this_PKG/install/slack-desc
+$PRGNAM: $PRGNAM ($SUMMARY)
 $PRGNAM:
-$PRGNAM: $(grep -a "s\.description = " $package_this_PKG$GEMSROOT/specifications/*.gemspec | grep -a -o "%q{.*}" | sed 's|%q{||' | tr -d '}')
+$FMTDESCRIPTION
+$PRGNAM:
+$FMTHOMEPAGE
+$PRGNAM: packaged by $(basename $0)
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM: $(grep -a "s\.homepage = " $package_this_PKG$GEMSROOT/specifications/*.gemspec | grep -a -o "%q{.*}" | sed 's|%q{||' | tr -d '}')
 $PRGNAM:
 EOF
+
+    mkdir -p $package_this_PKG/usr/doc/$PRGNAM-$VERSION
+    sed -e "s/^${PRGNAM}: *//" \
+      < $package_this_PKG/install/slack-desc \
+      > $package_this_PKG/usr/doc/$PRGNAM-$VERSION/README
+
+    if [ -d $package_this_PKG$GEMSROOT/bin/ ]; then
+        mkdir -p $package_this_PKG/usr/bin
+        for b in $package_this_PKG$GEMSROOT/bin/*; do
+            [ -f $b ] && cp $b $package_this_PKG/usr/bin
+        done
+    fi
 
     chown -R root:root .
 
