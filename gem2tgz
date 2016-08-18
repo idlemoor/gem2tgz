@@ -8,6 +8,7 @@ PACKAGE_ALL_LOCALS=${PACKAGE_ALL_LOCALS:-}
 CLEAN_AFTER=${CLEAN_AFTER:-}
 INSTALL=${INSTALL:-}
 VERSION=${VERSION:-}
+DEPFILES=${DEPFILES:-}
 
 BUILD=${BUILD:-1}
 TAG=${TAG:-_$(basename $0)}
@@ -69,9 +70,18 @@ $PRGNAM:
 EOF
 
     mkdir -p $package_this_PKG/usr/doc/$PRGNAM-$VERSION
-    sed -e "s/^${PRGNAM}: *//" \
-      < $package_this_PKG/install/slack-desc \
-      > $package_this_PKG/usr/doc/$PRGNAM-$VERSION/README-$(basename $0)
+
+    echo "$DESCRIPTION" | fmt -70 - > $package_this_PKG/usr/doc/$PRGNAM-$VERSION/README_$(basename $0)
+    DEPLIST="$(ruby -e "require 'rubygems/specification'; puts Gem::Specification.load(\"$GEMSPEC\").runtime_dependencies" | sed -e 's/^/rubygem-/' -e 's/ (.*//')"
+    if [ -n "$DEPLIST" ]; then
+      cat <<EOF >> $package_this_PKG/usr/doc/$PRGNAM-$VERSION/README_$(basename $0)
+
+Mandatory dependencies:
+
+$DEPLIST
+EOF
+    fi
+
     for doc in \
       $package_this_PKG$GEMSROOT/gems/$GEMNAM-$VERSION/README* \
       $package_this_PKG$GEMSROOT/gems/$GEMNAM-$VERSION/*LICENSE* \
@@ -93,6 +103,10 @@ EOF
     chown -R root:root .
 
     /sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.${PKGTYPE:-tgz}
+
+    if [ -n "$DEPFILES" ]; then
+      [ -n "$DEPLIST" ] && echo "$DEPLIST" > $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.dep
+    fi
 
     [ "x$INSTALL" == "x--install" ] && /sbin/installpkg $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz
     [ "x$CLEAN_AFTER" == "xYES" ] && rm -fr $package_this_PKG
