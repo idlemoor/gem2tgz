@@ -98,6 +98,12 @@ EOF
             [ -f $b ] && cp $b $package_this_PKG/usr/bin
         done
         rmdir --ignore-fail-on-non-empty $package_this_PKG/usr/bin
+    elif [ -d $package_this_PKG$GEMSROOT/exe/ ]; then
+        mkdir -p $package_this_PKG/usr/bin
+        for b in $package_this_PKG$GEMSROOT/exe/*; do
+            [ -f $b ] && cp $b $package_this_PKG/usr/bin
+        done
+        rmdir --ignore-fail-on-non-empty $package_this_PKG/usr/bin
     fi
 
     chown -R root:root .
@@ -129,6 +135,12 @@ function package_all_under() {
         if [ -e $TMP/pkg-rubygem-$this_GEM-$this_GEM_VERSION$GEMSROOT/gems/$i/bin/ ]; then
             mkdir -p $TMP/pkg-rubygem-$this_GEM-$this_GEM_VERSION$GEMSROOT/bin/
             for b in $TMP/pkg-rubygem-$this_GEM-$this_GEM_VERSION$GEMSROOT/gems/$i/bin/* ; do
+                [ -f $b ] && cp -a $b $TMP/pkg-rubygem-$this_GEM-$this_GEM_VERSION$GEMSROOT/bin/
+            done
+            rmdir --ignore-fail-on-non-empty $TMP/pkg-rubygem-$this_GEM-$this_GEM_VERSION$GEMSROOT/bin/
+        elif [ -e $TMP/pkg-rubygem-$this_GEM-$this_GEM_VERSION$GEMSROOT/gems/$i/exe/ ]; then
+            mkdir -p $TMP/pkg-rubygem-$this_GEM-$this_GEM_VERSION$GEMSROOT/bin/
+            for b in $TMP/pkg-rubygem-$this_GEM-$this_GEM_VERSION$GEMSROOT/gems/$i/exe/* ; do
                 [ -f $b ] && cp -a $b $TMP/pkg-rubygem-$this_GEM-$this_GEM_VERSION$GEMSROOT/bin/
             done
             rmdir --ignore-fail-on-non-empty $TMP/pkg-rubygem-$this_GEM-$this_GEM_VERSION$GEMSROOT/bin/
