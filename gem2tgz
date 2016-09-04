@@ -242,7 +242,7 @@ else
     gem install $GEM $VERSION \
         --install-dir $PKG$GEMSROOT \
         --force \
-        $MAKE_DEPS
+        $MAKE_DEPS || exit 1
 
     if [ "x$MAKE_DEPS" == "x" ]; then
         package_all_under $PKG$GEMSROOT
